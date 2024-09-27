@@ -52,5 +52,7 @@ class AktualniVykonSensor(Entity):
 
     async def async_update(self):
         result = self._client.read_holding_registers(0x0003, 1)
-        if result:
+        if result.isError():
+            _LOGGER.error("Error reading temperature from Modbus device: %s", result)
+        else:
             self._state = result.registers[0]  # jednotky v %
