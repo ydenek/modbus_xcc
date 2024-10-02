@@ -1,7 +1,6 @@
 import logging
 from homeassistant.helpers.entity import Entity
-from homeassistant.helpers.device_registry import DeviceEntryType, async_get as async_get_device_registry
-from homeassistant.helpers.entity_registry import async_get as async_get_entity_registry
+from homeassistant.helpers.device_registry import async_get as async_get_device_registry
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -15,22 +14,21 @@ async def async_setup_entry(hass, entry, async_add_entities):
     else:
         _LOGGER.info("Debug log: Modbus client connected")
 
-    # Získání registru zařízení
-    device_registry = await async_get_device_registry(hass)
+    # Získání registru zařízení (nyní synchronně bez await)
+    device_registry = async_get_device_registry(hass)
 
-    # Vytvoření zařízení, které bude mít IP adresu a bude propojeno s entitami
-    device = device_registry.async_get_or_create(
+    # Vytvoření zařízení
+    device_registry.async_get_or_create(
         config_entry_id=entry.entry_id,
         identifiers={(DOMAIN, device_id)},
         manufacturer="Your Manufacturer",  # Výrobce zařízení
         model="Your Model",  # Model zařízení
         name="Modbus Device",
         sw_version="1.0",  # Verze software zařízení
-        entry_type=DeviceEntryType.SERVICE,  # Typ zařízení (volitelně SERVICE)
         configuration_url=f"http://192.168.7.17"
     )
 
-    # Vytvoření a registrace senzorů, přidání odkazu na zařízení
+    # Vytvoření a registrace senzorů
     sensors = [
         VenkovniTeplotaSensor(client, device_id),
         AktualniVykonSensor(client, device_id)
