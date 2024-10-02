@@ -14,17 +14,17 @@ async def async_setup_entry(hass, entry, async_add_entities):
     else:
         _LOGGER.info("Debug log: Modbus client connected")
 
-    # Získání registru zařízení (nyní synchronně bez await)
+    # Získání registru zařízení (bez await)
     device_registry = async_get_device_registry(hass)
 
-    # Vytvoření zařízení
-    device_registry.async_get_or_create(
+    # Vytvoření zařízení (pokud už není vytvořeno)
+    device = device_registry.async_get_or_create(
         config_entry_id=entry.entry_id,
         identifiers={(DOMAIN, device_id)},
-        manufacturer="Your Manufacturer",  # Výrobce zařízení
-        model="Your Model",  # Model zařízení
+        manufacturer="Your Manufacturer",
+        model="Your Model",
         name="Modbus Device",
-        sw_version="1.0",  # Verze software zařízení
+        sw_version="1.0",
         configuration_url=f"http://192.168.7.17"
     )
 
@@ -52,6 +52,7 @@ class VenkovniTeplotaSensor(Entity):
 
     @property
     def device_info(self):
+        # Propojení senzoru se zařízením přes identifiers
         return {
             "identifiers": {(DOMAIN, self._device_id)},
         }
@@ -79,6 +80,7 @@ class AktualniVykonSensor(Entity):
 
     @property
     def device_info(self):
+        # Propojení senzoru se zařízením přes identifiers
         return {
             "identifiers": {(DOMAIN, self._device_id)},
         }
